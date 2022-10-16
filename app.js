@@ -1,7 +1,7 @@
 // functions:
 function addTodo(e) {
     e.preventDefault();
-    console.log(e);
+    // console.log(e);
     // get todo value
     // create new todo
     // add to DOM
@@ -16,6 +16,7 @@ function addTodo(e) {
     todoDiv.innerHTML = newTodo;
     const todoList = document.querySelector(".todo-container");
     todoList.append(todoDiv)
+    saveLocalTodos(todoInput.value);
     todoInput.value = "";
 
 }
@@ -31,6 +32,7 @@ function checkRemove(e) {
     }
     else if (classList[1] === "fa-trash-alt") {
         const todo = item.parentElement.parentElement;
+        removeLocalTodos(todo);
         todo.remove();
 
     }
@@ -67,6 +69,50 @@ function filterTodos(e) {
 
 
 }
+// Local Storage
+function getLocalTodos() {
+
+
+    let savedTodos = localStorage.getItem('todos')
+        ? JSON.parse(localStorage.getItem('todos'))
+        : [];
+    savedTodos.forEach(todo => {
+        const todoDiv = document.createElement('div');
+        todoDiv.classList.add("todo");
+        const newTodo = `
+                <li>${todo}</li>
+                <span><i class="far fa-check-square"></i></span>
+                <span><i class="far fa-trash-alt"></i></span>`;
+        todoDiv.innerHTML = newTodo;
+        const todoList = document.querySelector(".todo-container");
+        todoList.append(todoDiv)
+    })
+
+}
+function saveLocalTodos(todo) {
+    // console.log(todo);
+    // localStorage.getItem('todos');
+    // localStorage.setItem('todos', JSON.stringify(todos));
+
+    let savedTodos = localStorage.getItem('todos')
+        ? JSON.parse(localStorage.getItem('todos'))
+        : [];
+    savedTodos.push(todo);
+    // console.log(savedTodos);
+    localStorage.setItem('todos', JSON.stringify(savedTodos));
+
+}
+
+function removeLocalTodos(todo) {
+    // console.log(todo.children[0].innerText);
+
+    let savedTodos = localStorage.getItem('todos')
+        ? JSON.parse(localStorage.getItem('todos'))
+        : [];
+
+    const newTodos = savedTodos.filter(t => t !== todo.children[0].innerText);
+    localStorage.setItem('todos', JSON.stringify(newTodos));
+}
 
 // selectors:
 const todoInput = document.querySelector(".todo-input");
@@ -75,11 +121,8 @@ const todoList = document.querySelector(".todo-container");
 const filterOption = document.querySelector(".filter-todos");
 
 
-
-
-
 // event listeners:
 addBtn.addEventListener('click', addTodo);
 todoList.addEventListener('click', checkRemove);
 filterOption.addEventListener('click', filterTodos);
-
+document.addEventListener("DOMContentLoaded", getLocalTodos);
